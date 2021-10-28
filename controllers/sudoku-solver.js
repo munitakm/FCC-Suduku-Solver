@@ -1,25 +1,61 @@
 class SudokuSolver {
-
-  validate(puzzleString) {
+  
+  validate(string) {
+    if(string.length !== 81) return 'Expected puzzle to be 81 characters long';
+    if(string.match(/[1-9.]/g).length == 81) return true;
+    return 'Invalid characters in puzzle';
   }
 
-  checkRowPlacement(puzzleString, row, column, value) {
-
+  checkRowPlacement(g, row, col, value) {
+    for(let i = 0; i < 9; i++) { 
+      if(g[row][i] == value && [row, col] != [row, i]) return false;
+    }
+    return true;
   }
 
-  checkColPlacement(puzzleString, row, column, value) {
-
+  checkColPlacement(g, row, col, value) {
+    for(let i = 0; i < 9; i++) { 
+      if(g[i][col] == value && [row,col] != [i, col]) return false; 
+    }
+    return true;
   }
 
-  checkRegionPlacement(puzzleString, row, column, value) {
+  checkRegionPlacement(g, row, col, value) {
+    let boxX = Math.floor(col / 3);
+    let boxY = Math.floor(row / 3);
+    for(let i = boxY*3; i < boxY*3 + 3; i++) { 
+      for(let j = boxX*3; j < boxX*3 + 3; j++) { 
+        if(g[i][j] == value && [row,col] != [i,j]) return false;
+      }
+      return true;
+    }
 
   }
-
-  solve(puzzleString) {
-    
+  findEmpty(bo) { 
+    for(let row in bo) { 
+        for(let col in bo[row]) { 
+            if(bo[row][col] === '.') return [row,col];
+        }
+    }
+    return false;
+}
+  solve(bo) {
+    let find = this.findEmpty(bo);
+    if(!find) return true;
+    const row = find[0];
+    const col = find[1];
+    for(let i = 1; i < 10; i++) { 
+      if(this.checkRowPlacement(bo, row, col, i) &&
+         this.checkColPlacement(bo, row, col, i) &&
+         this.checkRegionPlacement(bo, row, col, i)
+      ) { 
+        bo[row][col] = i.toString();
+        if(this.solve(bo)) return true;
+        bo[row][col] = '.'
+      }
+    }
   }
 }
-
 module.exports = SudokuSolver;
 
 let grid = [
@@ -44,17 +80,6 @@ let gridR = [
   [ '.', '.', '1', '6', '.', '.', '.', '.', '9' ],
   [ '2', '6', '9', '1', '4', '.', '3', '7', '.' ] ];
  
-const validator = (str) => { 
-    return str.length == 81;
-
-}
-
-const pegaNumero = (str) => { 
-    str = str.split('').filter(i => (/[0-9]/).test(i))
-    return str.length;
-
-}
-
 const montaGrid = (str) => {
     let linhas = []; 
     for(let i = 0; i < 9; i++) { 
@@ -62,18 +87,6 @@ const montaGrid = (str) => {
     }
     return linhas.map(i => i.split(''));
 }
-
-const montaColunas = () => { 
-    let colunas = [];
-    for(let i = 0; i < 9; i++) {
-        let coluna = [];
-        for(let n of linhasArray) { 
-        coluna.push(n[i])
-    }
-        colunas.push(coluna)
-    }
-    return colunas;
-}    
 
 const valid = (bo, num, pos) => { 
   let row = pos[0];
@@ -104,8 +117,7 @@ const valid = (bo, num, pos) => {
 const findEmpty = (bo) => { 
     for(let row in bo) { 
         for(let col in bo[row]) { 
-            if(bo[row][col] === '.') return [row,col];
-            
+            if(bo[row][col] == '.') return [row,col];
         }
     }
     return false;
@@ -127,6 +139,3 @@ const solve = (bo) => {
     return false;
 }
 
-//------------------------
-console.log(solve(gridR))
-console.log(gridR)
