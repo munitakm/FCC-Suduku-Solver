@@ -48,10 +48,9 @@ module.exports = function (app) {
     
   app.route('/api/solve')
     .post((req, res) => {
-      console.log(req.body);
+      if(!req.body.puzzle) return res.json({error: 'Required field missing'});
       const sSolver = new SudokuSolver();
       const validateString = sSolver.validate(req.body.puzzle);
-      if(!req.body.puzzle) return res.json({error: 'Required field missing'});
       if(validateString == true) { 
       if(!valid(montaGrid(req.body.puzzle)))
         return res.json({error: 'Puzzle cannot be solved'});
