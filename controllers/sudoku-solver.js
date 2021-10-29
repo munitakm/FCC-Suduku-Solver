@@ -27,9 +27,8 @@ class SudokuSolver {
       for(let j = boxX*3; j < boxX*3 + 3; j++) { 
         if(g[i][j] == value && [row,col] != [i,j]) return false;
       }
-      return true;
     }
-
+    return true;
   }
   findEmpty(bo) { 
     for(let row in bo) { 

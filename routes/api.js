@@ -9,15 +9,31 @@ module.exports = function (app) {
 
   app.route('/api/check')
     .post((req, res) => {
+      const form = req.body;
       console.log(req.body)
       const sSolver = new SudokuSolver();
-      let validateString = sSolver.validate(req.body.puzzle);
+      let validateString = sSolver.validate(form.puzzle);
       if(validateString == true) { 
-        if(!req.body.coordinate || !req.body.value) return res.json({error: 'Required field missing'})
-        if(!(/^[A-I]{1}[1-9]{1}$/).test(req.body.coordinate)) return res.json({error: 'Invalid coordinate'});
-        if(!(/^[1-9]{1}$/).test(req.body.value)) return res.json({error: 'Invalid value'})
-    let grid = montaGrid(req.body.puzzle);
-        console.log("passou")
+        if(!form.coordinate || !form.value) return res.json({error: 'Required field(s) missing'})
+        if(!(/^[A-I]{1}[1-9]{1}$/).test(form.coordinate)) return res.json({error: 'Invalid coordinate'});
+        if(!(/^[1-9]{1}$/).test(form.value)) return res.json({error: 'Invalid value'})
+    let grid = montaGrid(form.puzzle);
+    let conf = [];
+    const row = ('ABCDEFGHI').indexOf(form.coordinate[0]);
+    const col = form.coordinate[1] - 1;
+    const val = form.value;
+        console.log(row, col, val)
+        if(sSolver.checkRowPlacement(grid,row,col,val) == false) conf.push('row');
+        if(sSolver.checkColPlacement(grid,row,col,val) == false) conf.push('column');
+        if(sSolver.checkRegionPlacement(grid,row,col,val) == false) conf.push('region');
+        console.log(conf)
+        if(conf == '') { 
+        return res.json({valid: true});
+      } else {
+      console.log(conf)
+      return res.json({valid: false, conflict: conf});
+      }
+      
     } else { 
       console.log(validateString)
       res.json({error: validateString})
