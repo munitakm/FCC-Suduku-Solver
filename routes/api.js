@@ -23,9 +23,15 @@ module.exports = function (app) {
     const col = form.coordinate[1] - 1;
     const val = form.value;
         console.log(row, col, val)
-        if(sSolver.checkRowPlacement(grid,row,col,val) == false) conf.push('row');
-        if(sSolver.checkColPlacement(grid,row,col,val) == false) conf.push('column');
-        if(sSolver.checkRegionPlacement(grid,row,col,val) == false) conf.push('region');
+        if(sSolver.checkRowPlacement(grid,row,col,val) == false &&
+        grid[row][col] !== val
+        ) conf.push('row');
+        if(sSolver.checkColPlacement(grid,row,col,val) == false && 
+        grid[row][col] !== val
+        ) conf.push('column');
+        if(sSolver.checkRegionPlacement(grid,row,col,val) == false && 
+        grid[row][col] !== val
+        ) conf.push('region');
         console.log(conf)
         if(conf == '') { 
         return res.json({valid: true});
