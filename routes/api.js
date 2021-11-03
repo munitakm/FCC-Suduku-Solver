@@ -10,7 +10,7 @@ module.exports = function (app) {
   app.route('/api/check')
     .post((req, res) => {
       const form = req.body;
-      console.log(req.body)
+      console.log(form)
       const sSolver = new SudokuSolver();
       let validateString = sSolver.validate(form.puzzle);
       if(validateString == true) { 
